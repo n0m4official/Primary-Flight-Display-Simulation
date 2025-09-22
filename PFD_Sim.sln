@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36511.14 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PFD_Sim", "PFD_Sim.vcxproj", "{04B3490E-7F74-46D9-9D04-7218CB2713DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04B3490E-7F74-46D9-9D04-7218CB2713DE}.Debug|x64.ActiveCfg = Debug|x64
+		{04B3490E-7F74-46D9-9D04-7218CB2713DE}.Debug|x64.Build.0 = Debug|x64
+		{04B3490E-7F74-46D9-9D04-7218CB2713DE}.Release|x64.ActiveCfg = Release|x64
+		{04B3490E-7F74-46D9-9D04-7218CB2713DE}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0856E627-8F24-49E6-B0D7-A119AF859C48}
+	EndGlobalSection
+EndGlobal
