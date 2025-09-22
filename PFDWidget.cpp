@@ -21,7 +21,7 @@ PFDWidget::PFDWidget(QWidget* parent)
 
 // -------------------- Public setters --------------------
 // Sacred setters, touch at your own peril
-void PFDWidget::setPitch(float deg) { pitch = qBound(-90.0f, deg, 90.0f); update(); } // don't ask why ±90, just don't
+void PFDWidget::setPitch(float deg) { pitch = qBound(-90.0f, deg, 90.0f); update(); } // don't ask why Â±90, just don't
 void PFDWidget::setRoll(float deg) { roll = fmodf(deg, 360.0f); update(); }
 void PFDWidget::setYaw(float deg) { yaw = fmodf(deg, 360.0f); update(); }
 void PFDWidget::setThrottle(float val) { throttle = qBound(0.0f, val, 100.0f); update(); } // throttle = life force
@@ -69,7 +69,7 @@ void PFDWidget::updateSimulation()
     const float thrStep = 0.5f;
     // Changing these will cause the aircraft to defy known physics. Seriously.
 
-    // Apply control changes (don’t question the math)
+    // Apply control changes (donâ€™t question the math)
     if (pitchUp)    pitch += pitchStep;
     if (pitchDown)  pitch -= pitchStep;
     if (rollLeft)   roll -= rollStep;
@@ -78,7 +78,7 @@ void PFDWidget::updateSimulation()
     if (yawRight)   yaw += yawStep;
     if (thrUp)      throttle += thrStep;
     if (thrDown)    throttle -= thrStep;
-    // The ± numbers somehow produce a smooth simulation. Don't ask why, it hurts.
+    // The Â± numbers somehow produce a smooth simulation. Don't ask why, it hurts.
 
     // Auto-leveling: like a guardian angel for my broken code
     const float autoLevelRate = 0.03f;
@@ -258,7 +258,7 @@ void PFDWidget::drawHorizon(QPainter& p, int cx, int cy, int radius)
             QString txt = QString::number(qAbs(pdeg));
             p.drawText(-len - 30, y + 5, txt);
             p.drawText(len + 8, y + 5, txt);
-            // Don't ask why offsets are ±30 and ±8, it's voodoo
+            // Don't ask why offsets are Â±30 and Â±8, it's voodoo
         }
     }
 
@@ -314,7 +314,7 @@ void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
     // Yes, alpha 220. Don't ask. Trust me. Or don't.
 
     const float centerY = float(y + height / 2);
-    const float pixelsPerUnit = float(height) / (tickSpacing * 2); // ±tickSpacing visible
+    const float pixelsPerUnit = float(height) / (tickSpacing * 2); // Â±tickSpacing visible
     // If you change tickSpacing, everything goes wonky, like a drunk tape
 
     int tickStart = int(displayedValue) - int(tickSpacing);
@@ -424,7 +424,7 @@ void PFDWidget::drawHSI(QPainter& p, int cx, int cy, int radius)
     // If you rotate before translate, you'll enter the Twilight Zone
 
     p.setPen(QPen(Qt::white, 2));
-    p.drawEllipse(QPointF(0, 0), radius, radius);
+    p.drawEllipse(QPointF(0, 0), radius, radius);    // Adding this somehow fucked up the display
 
     for (int hdg = 0; hdg < 360; hdg += 30) {
         float angle = qDegreesToRadians(float(hdg));
