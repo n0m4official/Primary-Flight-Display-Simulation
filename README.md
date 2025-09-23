@@ -59,18 +59,15 @@ A window will open, displaying the simulated PFD.
 
 ## Controls
 
-| Key                | Function                  |
+| Key                | Function                 |
 |--------------------|--------------------------|
-| Arrow Up/Down      | Increase/Decrease pitch  |
-| Arrow Left/Right   | Bank left/right (roll)   |
-| A / Z              | Increase/Decrease airspeed |
-| Q / W              | Increase/Decrease altitude |
-| H / J              | Change heading           |
-| V / B              | Change vertical speed    |
-| R                  | Reset all parameters     |
-| Esc                | Exit simulation          |
+| W / S              | Increase/Decrease (pitch)|
+| A / D              | Bank left/right (roll)   |
+| R / F              | Increase/Decrease airspeed |
+| T / G              | Increase/Decrease altitude |
+| Q / E              | Turn left/right (yaw)    |
 
-*Exact controls may vary; check the source code for the latest mappings.*
+*Note: YAW control included as a formality, doesn't affect anything*
 
 ## Project Structure
 
