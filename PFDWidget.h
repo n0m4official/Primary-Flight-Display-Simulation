@@ -92,7 +92,7 @@ private:
 	void drawHorizon(QPainter& p, int cx, int cy, int radius); // Horizon: rotates everything I know
 	void drawFlightDirector(QPainter& p, int cx, int cy); // Green cross, sanity optional
 	void drawSpeedTape(QPainter& p, int x, int y, int width, int height); // Numbers
-	void drawAltitudeTape(QPainter& p, int x, int y, int width, int height);
+	void drawAltitudeTape(QPainter& p, int x, int y, int width, int height); // Numbers that make me want to cry
 
 	// Generic helper for smooth tapes
 	void drawTape(QPainter& p, int x, int y, int width, int height,
@@ -101,15 +101,18 @@ private:
 		const std::vector<std::pair<int, QString>>& vSpeeds,
 		int selectedBug);
 
-	void drawHSI(QPainter& p, int cx, int cy, int radius); // Compass that works, somehow
+	void drawHSI(QPainter& p, int cx, int cy, int radius); // Compass that works, somehow...
 	void drawILS(QPainter& p, int cx, int cy); // Pink bars, don't ask
 
 	// Altitude bug (altitude selector/bug for tape)
 	int altBug = 0; // default to 0
+	// THIS STILL DOESN'T WORK, removing it fucks up the tape drawing for some reason, i give up
 
 	// Altitude bug selected (highlighted/selected bug for tape)
 	int altBugSelected = 0; // default to 0
+	// Same here; doesn't work, but removing it breaks the tape drawing, so whatever
 
 	// V-speeds for altitude tape (empty by default, can be filled as needed)
 	std::vector<std::pair<int, QString>> vSpeeds; // None right now, maybe later
+	// Also doesn't work, but removing it breaks literally everything, so yeah...
 };

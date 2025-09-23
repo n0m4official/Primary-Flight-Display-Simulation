@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
 
-    // Warning: I don't know why this works, it just does. Tread carefully.
+    // I don't know why this works, it just does.
     PFDWidget w;
     w.resize(800, 500);
     w.show();
