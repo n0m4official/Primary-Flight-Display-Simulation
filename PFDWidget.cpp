@@ -151,70 +151,61 @@ void PFDWidget::updateSimulation()
 void PFDWidget::paintEvent(QPaintEvent*)
 {
     QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, true); // maybe I should stop caring about pixels
+    p.setRenderHint(QPainter::Antialiasing, true);
 
     const int w = width();
     const int h = height();
     const int cx = w / 2;
     const int cy = h / 2;
 
-    // background
-    p.fillRect(rect(), Qt::black); // void is comforting
+    // Background
+    p.fillRect(rect(), Qt::black);
 
-    // Draw horizon (rotates & translates together)
+    // Horizon & pitch ladder
     drawHorizon(p, cx, cy, h / 3);
 
-    // Flight director: tiny green cross of hope
-    drawFlightDirector(p, cx, cy);
-
-    // Speed & altitude tapes (screen anchored)
+    // Tapes
     drawSpeedTape(p, 20, 50, 80, h - 120);
     drawAltitudeTape(p, w - 100, 50, 80, h - 120);
 
-    // Baro setting box: magic numbers here, don't touch
-    {
-        QRect baroBox(width() - 80, height() - 40, 70, 30);
-        p.setBrush(QColor(0, 0, 0, 200));
-        p.setPen(Qt::white);
-        p.drawRect(baroBox);
+    // ILS / Terrain
+    drawILS(p, cx, cy);
 
-        QString text;
-        if (baroStd)
-            text = "STD";
-        else
-            text = QString::number(baroPressure) + " hPa";
+    // Compass / HSI with heading integrated
+    drawHSI(p, cx, cy, 80);
 
-        p.setFont(QFont("Arial", 10, QFont::Bold));
-        p.drawText(baroBox, Qt::AlignCenter, text);
-    }
+    // Flight Director
+    drawFlightDirector(p, cx, cy);
+
+    // Baro Setting
+    QRect baroBox(width() - 80, height() - 40, 70, 30);
+    p.setBrush(QColor(0, 0, 0, 200));
+    p.setPen(Qt::white);
+    p.drawRect(baroBox);
+    QString text = baroStd ? "STD" : QString::number(baroPressure) + " hPa";
+    p.setFont(QFont("Arial", 10, QFont::Bold));
+    p.drawText(baroBox, Qt::AlignCenter, text);
 
     // Radio Altimeter
     if (showRadioAlt && radioAltitude < 2500.0f) {
         QRect raBox(width() - 80, height() - 75, 70, 30);
         p.setBrush(QColor(0, 0, 0, 200));
-        p.setPen(Qt::white);
-        p.drawRect(raBox);
-
-        p.setFont(QFont("Arial", 10, QFont::Bold));
         p.setPen(Qt::yellow);
+        p.drawRect(raBox);
+        p.setFont(QFont("Arial", 10, QFont::Bold));
         p.drawText(raBox, Qt::AlignCenter, QString("RA %1 ft").arg(int(radioAltitude)));
     }
 
-    // Readouts: alt, speed, throttle, heading. Like my heart rate while debugging
+    // Other readouts (ALT, SPD, THR) — leave bottom text for only these
     p.setFont(font);
     p.setPen(Qt::white);
-    p.drawText(cx - 60, h - 36, QString("ALT: %1 ft").arg(int(altitude)));
-    p.drawText(cx - 60, h - 16, QString("SPD: %1 kt").arg(int(speed)));
-    p.drawText(cx + 20, h - 36, QString("THR: %1%").arg(int(throttle)));
-    p.drawText(cx + 20, h - 16, QString("HDG: %1").arg(int(heading)));
-
-    // HSI (top)
-    drawHSI(p, cx, cy, h / 3);
-
-    // ILS bars (purple) independent
-    drawILS(p, cx, cy);
+    int margin = 20;
+    int leftX = margin;
+    int rightX = w - 120;
+    p.drawText(leftX, h - 36, QString("ALT: %1 ft").arg(int(altitude)));
+    p.drawText(leftX, h - 16, QString("SPD: %1 kt").arg(int(speed)));
+    p.drawText(rightX, h - 36, QString("THR: %1%").arg(int(throttle)));
 }
-
 // -------------------- Horizon & Ladder (tied together) --------------------
 // WARNING: touching this will cause visual insanity
 void PFDWidget::drawHorizon(QPainter& p, int cx, int cy, int radius)
@@ -298,7 +289,6 @@ void PFDWidget::drawFlightDirector(QPainter& p, int cx, int cy)
 }
 
 // -------------------- Generic Smooth Tape Drawing --------------------
-// Warning: look at this too long and reality bends
 void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
     float displayedValue, float tickSpacing, int majorTick,
     const QString& unit, int decisionHeightBug,
@@ -308,44 +298,38 @@ void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
     p.save();
 
     // Background
+    QRect tapeRect(x, y, width, height);
     p.setPen(Qt::NoPen);
     p.setBrush(QColor(20, 20, 20, 220));
-    p.drawRect(x, y, width, height);
-    // Yes, alpha 220. Don't ask. Trust me. Or don't.
+    p.drawRect(tapeRect);
 
-    const float centerY = float(y + height / 2);
-    const float pixelsPerUnit = float(height) / (tickSpacing * 2); // ±tickSpacing visible
-    // If you change tickSpacing, everything goes wonky, like a drunk tape
+    const float centerY = y + height / 2.0f;
+    const float pixelsPerUnit = float(height) / (tickSpacing * 2.0f);
 
-    int tickStart = int(displayedValue) - int(tickSpacing);
-    int tickEnd = int(displayedValue) + int(tickSpacing);
+    // -------------------- Draw ticks & numbers --------------------
+    int tickStep = 10; // minor tick step
+    int startVal = int(displayedValue - tickSpacing) / tickStep * tickStep;
+    int endVal = int(displayedValue + tickSpacing) / tickStep * tickStep;
 
-    float frac = displayedValue - int(displayedValue); // fractional part
-    // Why do I even care about the fraction? Beats me. But it works.
-
-    p.setFont(QFont("Arial", 10, QFont::Bold));
-    p.setPen(Qt::white);
-
-    // Draw ticks and numeric labels
-    for (int val = tickStart - (tickStart % 10); val <= tickEnd; val += 10)
+    for (int val = startVal; val <= endVal; val += tickStep)
     {
         float dy = (displayedValue - float(val)) * pixelsPerUnit;
         int ty = int(centerY + dy);
         if (ty < y || ty > y + height) continue;
 
         int tickLen = (val % majorTick == 0) ? 16 : 8;
+        p.setPen(Qt::white);
         p.drawLine(x, ty, x + tickLen, ty);
 
         if (val % majorTick == 0)
         {
-            p.drawText(QRect(x + 18, ty - 8, 50, 16),
-                Qt::AlignLeft | Qt::AlignVCenter,
-                QString::number(val));
-            // This rectangle math is basically a paper sacrifice to keep alignment
+            p.setFont(QFont("Arial", 10, QFont::Bold));
+            QRect textRect(x + tickLen + 2, ty - 8, width - tickLen - 4, 16);
+            p.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, QString::number(val));
         }
     }
 
-    // Decision height bug / altitude bug
+    // -------------------- Decision height bug --------------------
     if (decisionHeightBug > 0)
     {
         float dy = (displayedValue - float(decisionHeightBug)) * pixelsPerUnit;
@@ -359,11 +343,10 @@ void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
             p.setBrush(Qt::green);
             p.setPen(Qt::green);
             p.drawPolygon(bug);
-            // This bug will appear only if the stars align
         }
     }
 
-    // V-speed / selected speed bug
+    // -------------------- V-speed / stall / overspeed markers --------------------
     for (auto vs : vSpeeds)
     {
         float dy = (displayedValue - float(vs.first)) * pixelsPerUnit;
@@ -381,10 +364,9 @@ void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
         p.setPen(Qt::magenta);
         p.setFont(QFont("Arial", 8, QFont::Bold));
         p.drawText(x + width + 12, yPos - 4, vs.second);
-        // If this doesn't line up, blame the universe
     }
 
-    // Selected bug (MCP or altitude bug)
+    // -------------------- Selected bug --------------------
     if (selectedBug > 0)
     {
         float dy = (displayedValue - float(selectedBug)) * pixelsPerUnit;
@@ -395,14 +377,22 @@ void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
             p.setBrush(Qt::yellow);
             p.setPen(Qt::yellow);
             p.drawRect(selRect);
-            // Yellow rectangle of doom: one wrong number, everything shifts
         }
     }
+
+    // -------------------- Current-value box --------------------
+    QRect currentBox(x, int(centerY) - 10, width, 20);
+    p.setBrush(QColor(50, 50, 50, 200));
+    p.setPen(Qt::white);
+    p.drawRect(currentBox);
+
+    p.setFont(QFont("Arial", 10, QFont::Bold));
+    p.drawText(currentBox, Qt::AlignCenter, QString::number(int(displayedValue)));
 
     p.restore();
 }
 
-// -------------------- Wrapper for Speed/Altitude tapes --------------------
+// -------------------- Wrappers --------------------
 void PFDWidget::drawSpeedTape(QPainter& p, int x, int y, int width, int height)
 {
     drawTape(p, x, y, width, height, displayedSpeed, 40.0f, 20, "KT", 0, vSpeeds, 0);
@@ -419,22 +409,35 @@ void PFDWidget::drawHSI(QPainter& p, int cx, int cy, int radius)
     p.save();
     p.translate(cx, cy);
 
-    // compass rose: spinning, but my life is not
-    p.rotate(-heading);
-    // If you rotate before translate, you'll enter the Twilight Zone
+    // Rotate compass circle with aircraft yaw
+    p.rotate(-yaw);
 
+    // Draw compass circle
     p.setPen(QPen(Qt::white, 2));
     p.drawEllipse(QPointF(0, 0), radius, radius);
 
+    // Tick marks every 30°
     for (int hdg = 0; hdg < 360; hdg += 30) {
         float angle = qDegreesToRadians(float(hdg));
         float x1 = radius * qSin(angle);
         float y1 = -radius * qCos(angle);
-        float x2 = 0.9f * x1;
-        float y2 = 0.9f * y1;
+        float x2 = 0.85f * x1;
+        float y2 = 0.85f * y1;
         p.drawLine(QPointF(x1, y1), QPointF(x2, y2));
-        p.drawText(QPointF(1.1f * x1 - 10, 1.1f * y1 + 5), QString::number(hdg));
-        // Spaghetti trigonometry: never question it
+    }
+
+    // HDG text fixed to compass
+    p.setFont(QFont("Arial", 10, QFont::Bold));
+    p.setPen(Qt::white);
+    p.drawText(-20, -radius - 10, QString("HDG %1°").arg(int(yaw)));
+
+    // Optional: N/E/S/W markers
+    QStringList directions = { "N","E","S","W" };
+    for (int i = 0; i < 4; ++i) {
+        float angle = qDegreesToRadians(float(i * 90 - yaw));
+        float x = 0.7f * radius * qSin(angle);
+        float y = -0.7f * radius * qCos(angle);
+        p.drawText(QPointF(x - 5, y + 5), directions[i]);
     }
 
     p.restore();
