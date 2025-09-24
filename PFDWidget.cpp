@@ -4,7 +4,7 @@
 #include <QtMath>
 #include <QDebug>
 
-// PFDWidget.cpp: created because im a masochist who loves pain (sarcasm)
+// PFDWidget.cpp
 PFDWidget::PFDWidget(QWidget* parent)
     : QWidget(parent)
 {
@@ -14,12 +14,12 @@ PFDWidget::PFDWidget(QWidget* parent)
     // simulation timer (50 Hz)
     simulationTimer.setInterval(20);
     connect(&simulationTimer, &QTimer::timeout, this, &PFDWidget::updateSimulation);
-    simulationTimer.start(); // Removing this crashes the program and I have no fucking clue why or how. Seriously
+    simulationTimer.start(); // Removing this crashes the program and I have no clue why or how. Seriously
 }
 
 // -------------------- Public setters --------------------
 // Sacred setters, touch at your own peril
-void PFDWidget::setPitch(float deg) { pitch = qBound(-90.0f, deg, 90.0f); update(); } // don't ask why ±90, just don't, trust me, seriously
+void PFDWidget::setPitch(float deg) { pitch = qBound(-90.0f, deg, 90.0f); update(); } // don't ask why Â±90, just don't, trust me, seriously
 void PFDWidget::setRoll(float deg) { roll = fmodf(deg, 360.0f); update(); }
 void PFDWidget::setYaw(float deg) { yaw = fmodf(deg, 360.0f); update(); }
 void PFDWidget::setThrottle(float val) { throttle = qBound(0.0f, val, 100.0f); update(); } // throttle = life force
@@ -42,7 +42,7 @@ void PFDWidget::keyReleaseEvent(QKeyEvent* ev)
 }
 
 // -------------------- Simulation tick --------------------
-// this fucking function does everything, I hate it
+// this function does everything, I hate it
 void PFDWidget::updateSimulation()
 {
     // Read inputs
@@ -62,7 +62,7 @@ void PFDWidget::updateSimulation()
     const float rollStep = 0.9f;
     const float yawStep = 0.6f;
     const float thrStep = 0.5f;
-    // Changing these will cause the aircraft to act like a fucking F-15. Seriously.
+    // Changing these will cause the aircraft to act like an F-15. Seriously.
 
     // Apply control changes
     if (pitchUp)    pitch += pitchStep;
@@ -73,9 +73,9 @@ void PFDWidget::updateSimulation()
     if (yawRight)   yaw += yawStep;
     if (thrUp)      throttle += thrStep;
     if (thrDown)    throttle -= thrStep;
-    // The ± numbers somehow produce a smooth simulation. Don't ask why, it hurts.
+    // The Â± numbers somehow produce a smooth simulation. Don't ask why, it hurts.
 
-    // Auto-leveling, like a guardian angel for my shit coding skills
+    // Auto-leveling, like a guardian angel for my terrible coding skills
     const float autoLevelRate = 0.03f;
     if (!pitchUp && !pitchDown)
 		pitch += (0.0f - pitch) * autoLevelRate; // How this works? Magic, probably.
@@ -129,7 +129,7 @@ void PFDWidget::updateSimulation()
     dispPitch += (fdPitch - dispPitch) * 0.18f;
     dispRoll += (fdRoll - dispRoll) * 0.18f;
 
-	radioAltitude = altitude; // because pressure altimeters are dumb and they make me want to kill myself
+	radioAltitude = altitude; // because pressure altimeters make me want to cry
 
     // ILS wander
     localizerDeflection = qSin(qDegreesToRadians(heading * 2.2f)) * 0.55f;
@@ -166,7 +166,7 @@ void PFDWidget::paintEvent(QPaintEvent*)
     drawILS(p, cx, cy);
 
     // Compass / HSI with heading integrated
-	drawHSI(p, cx, cy, 80); // this fucking thing took me 8 goddamn hours to get right...
+	drawHSI(p, cx, cy, 80); // this thing took me 8 hours to get right...
 
     // Flight Director
     drawFlightDirector(p, cx, cy);
@@ -190,7 +190,7 @@ void PFDWidget::paintEvent(QPaintEvent*)
         p.drawText(raBox, Qt::AlignCenter, QString("RA %1 ft").arg(int(radioAltitude)));
     }
 
-    // Other readouts (ALT, SPD, THR) — leave bottom text for only these
+    // Other readouts (ALT, SPD, THR)
     p.setFont(font);
     p.setPen(Qt::white);
     int margin = 20;
@@ -201,14 +201,14 @@ void PFDWidget::paintEvent(QPaintEvent*)
     p.drawText(rightX, h - 36, QString("THR: %1%").arg(int(throttle)));
 }
 // -------------------- Horizon & Ladder (tied together) --------------------
-// I literally had to use AI to help fix this bullshit I spent so long on it. Don't judge me.
+// I literally had to use AI to help fix this thing because I spent so long on it. Don't judge me.
 void PFDWidget::drawHorizon(QPainter& p, int cx, int cy, int radius)
 {
     p.save();
     p.translate(cx, cy);
 
     // rotate world by -roll so aircraft symbol is fixed and horizon tilts
-	p.rotate(-roll); // WTF is rotation math? No idea. Didn't pay attention in school, sorry.
+	p.rotate(-roll); // I hate rotation math...
 
     const float scale = 3.0f;
     float horizonY = pitch * scale;
@@ -244,7 +244,7 @@ void PFDWidget::drawHorizon(QPainter& p, int cx, int cy, int radius)
             QString txt = QString::number(qAbs(pdeg));
             p.drawText(-len - 30, y + 5, txt);
             p.drawText(len + 8, y + 5, txt);
-            // Don't ask why offsets are ±30 and ±8, it's voodoo
+            // Don't ask why offsets are Â±30 and Â±8, it's voodoo
         }
     }
 
@@ -264,7 +264,7 @@ void PFDWidget::drawHorizon(QPainter& p, int cx, int cy, int radius)
 }
 
 // -------------------- Flight Director (green cross) --------------------
-// This took me 4 hours to get right. I am in debt from the ammount of energy drinks I bought to stay awake for this shit.
+// This took me 4 hours to get right. I am in debt from the ammount of energy drinks I bought to stay awake for this.
 void PFDWidget::drawFlightDirector(QPainter& p, int cx, int cy)
 {
     p.save();
@@ -285,7 +285,7 @@ void PFDWidget::drawFlightDirector(QPainter& p, int cx, int cy)
 }
 
 // -------------------- Generic Smooth Tape Drawing --------------------
-// This section is actual hell. Only touch if you want to suffer (or need to fix something (again)). Seriously, don't touch it
+// This section is actual pain. Only touch if you want to suffer (or need to fix something (again)). Seriously, don't touch it
 void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
     float displayedValue, float tickSpacing, int majorTick,
     const QString& unit, int decisionHeightBug,
@@ -382,7 +382,7 @@ void PFDWidget::drawTape(QPainter& p, int x, int y, int width, int height,
     }
 
     // -------------------- Current-value box --------------------
-	// This section was pure pain to implement, DON'T FUCKING TOUCH IT.
+	// This section was pure pain to implement, DON'T TOUCH IT.
 	// I'm serious, don't even think about it.
     QRect currentBox(x, int(centerY) - 10, width, 20);
     p.setBrush(QColor(50, 50, 50, 200));
@@ -410,7 +410,7 @@ void PFDWidget::drawAltitudeTape(QPainter& p, int x, int y, int width, int heigh
 }
 
 // -------------------- HSI & compass --------------------
-// Please grant me the sweet release of death... 8 hours on this bullshit...
+// Please grant me the sweet release of death... 8 hours on this...
 void PFDWidget::drawHSI(QPainter& p, int cx, int cy, int radius)
 {
     p.save();
@@ -422,9 +422,9 @@ void PFDWidget::drawHSI(QPainter& p, int cx, int cy, int radius)
     // Draw compass circle
     p.setPen(QPen(Qt::white, 2));
     p.drawEllipse(QPointF(0, 0), radius, radius);
-	// Circle math: never paid attention in geometry class, now I (somewhat) regret it
+	// Circle math: pain
 
-    // Tick marks every 30°
+    // Tick marks every 30Â°
     for (int hdg = 0; hdg < 360; hdg += 30) {
         float angle = qDegreesToRadians(float(hdg));
         float x1 = radius * qSin(angle);
@@ -437,9 +437,9 @@ void PFDWidget::drawHSI(QPainter& p, int cx, int cy, int radius)
     // HDG text fixed to compass
     p.setFont(QFont("Arial", 10, QFont::Bold));
     p.setPen(Qt::white);
-    p.drawText(-20, -radius - 10, QString("HDG %1°").arg(int(yaw)));
+    p.drawText(-20, -radius - 10, QString("HDG %1Â°").arg(int(yaw)));
 
-    // Optional: N/E/S/W markers
+    // N/E/S/W markers
     QStringList directions = { "N","E","S","W" };
     for (int i = 0; i < 4; ++i) {
         float angle = qDegreesToRadians(float(i * 90 - yaw));
