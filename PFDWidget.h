@@ -16,7 +16,7 @@ public:
 
 	// Setters
 	void setPitch(float deg);   // Just clamps it, don't ask why
-	void setRoll(float deg);    // Roll: ±infinity in my nightmares
+	void setRoll(float deg);    // Roll: Â±infinity in my nightmares
 	void setYaw(float deg);     // Yaw, because why not
 	void setThrottle(float val); // Don't go full 100 unless you want panic
 	void setAltitude(float val); // Can't go negative, unlike my patience
@@ -37,7 +37,7 @@ private:
 	float pitch = 0.0f;     // degrees, sleep deprived sanity
 	float roll = 0.0f;      // degrees, slowly rotating my patience
 	float yaw = 0.0f;       // degrees, just trust me
-	float throttle = 0.0f;  // percent 0-100, don’t break it
+	float throttle = 0.0f;  // percent 0-100, donâ€™t break it
 	float altitude = 10000; // feet, like my will to debug
 	float speed = 250;      // knots, apparently fast enough
 	float heading = 0.0f;   // degrees, rotates endlessly
@@ -49,6 +49,8 @@ private:
 	float Vref = 140.0f;    // Approach speed, sigh
 
 	int selectedSpeed = 250; // MCP selected speed, again
+
+	// These don't work, trying to fix them... sigh
 
 	// ILS / guidance demo
 	float localizerDeflection = 0.0f; // -1.0 to +1.0, barely makes sense
@@ -74,6 +76,7 @@ private:
 	const int STALL_SPEED = 120;         // KIAS, crash optional
 	const int VMO = 340;                 // Max operating speed, sure
 	const int MMO = 0.82f;               // Max Mach, dreams die here
+	// IDK why these don't work, need to spend more time fixing this
 
 	// Attitude bugs and settings
 	int decisionHeight = 200;       // DH in feet
@@ -106,7 +109,7 @@ private:
 
 	// Altitude bug (altitude selector/bug for tape)
 	int altBug = 0; // default to 0
-	// THIS STILL DOESN'T WORK, removing it fucks up the tape drawing for some reason, i give up
+	// THIS STILL DOESN'T WORK, removing it screws up the tape drawing for some reason, i give up
 
 	// Altitude bug selected (highlighted/selected bug for tape)
 	int altBugSelected = 0; // default to 0
